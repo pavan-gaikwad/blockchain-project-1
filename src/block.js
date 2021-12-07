@@ -43,11 +43,21 @@ class Block {
             let currentBlockHash = this.hash;
 
             // Recalculate the hash of the Block
-            const calculatedHash = SHA256(this.height+this.body+this.time+this.previousBlockHash);
-            // Comparing if the hashes changed
-            const compare = currentBlockHash == calculatedHash;
+            // const calculatedHash = SHA256(this.height+this.body+this.time+this.previousBlockHash);
+            // // Comparing if the hashes changed
+            // const compare = currentBlockHash == calculatedHash;
+       
             
-            resolve(compare);
+            const newHash = SHA256(
+                JSON.stringify(
+                    {
+                        ...self,
+                        "hash": null
+                    })).toString();
+            
+            
+            
+            resolve(self.hash === newHash);
 
             // Returning the Block is not valid
             

@@ -72,7 +72,10 @@ class Blockchain {
                block.previousBlockHash = 0;
                block.height = currentHeight;
                block.time = (new Date()).toString();
-               block.hash = SHA256(block.height+block.body+block.time+block.previousBlockHash).toString();
+            //    block.hash = SHA256(block.height+block.body+block.time+block.previousBlockHash).toString();
+            
+            
+               block.hash = SHA256(JSON.stringify({...block})).toString();
                this.chain.push(block);
                this.height = currentHeight;
                let log = await this.validateChain();
@@ -91,7 +94,7 @@ class Blockchain {
                 block.previousBlockHash = this.chain[this.chain.length - 1].hash;
                 block.height = currentHeight + 1;
                 block.time = (new Date()).toString();
-                block.hash = SHA256(block.height+block.body+block.time+block.previousBlockHash).toString();
+                block.hash = SHA256(JSON.stringify({...block})).toString();
                 this.chain.push(block);
                 this.height = currentHeight + 1;
                 let log = await this.validateChain();
@@ -243,16 +246,23 @@ class Blockchain {
                     
                 }else{
                 
-                let blockValidation = block.validate();
                 let lastBlockHash = block.previousBlockHash;
+                
+                block.validate().then(ok => {
+                    let blockValidation = ok; 
 
-                if(! blockValidation){
-                    errorLog.push({block, "error": "block validation failed"});
-                }
-                if(lastBlockHash != previousBlockHash){
-                    errorLog.push({block, "error": "previous hash mismatch"});
-                }
-                previousBlockHash = block.hash;
+                    if(! blockValidation){
+                        errorLog.push({block, "error": "block validation failed"});
+                    }
+                    if(lastBlockHash != previousBlockHash){
+                        errorLog.push({block, "error": "previous hash mismatch"});
+                    }
+                    previousBlockHash = block.hash;
+                    
+                });
+                
+
+                
 
             }
             });
